@@ -2,15 +2,12 @@ import pandas as pd
 import csv
 import numpy as np
 import re
-
 import os
 import fnmatch
 from datetime import datetime
 
-work_dir = 'smb://cifs2.partners.org/aphasia$/Patients'
-
+work_dir = '/Users/DickersonLab/Desktop/'
 os.chdir(work_dir)
-
 
 def find(pattern, path):
     result = []
@@ -20,68 +17,80 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
-lang_files = find('*.xls', work_dir + '/Patients/')
+lang_file = work_dir + 'PPA_Master_spreadsheet_050117.xlsx'
+lang = pd.read_excel(lang_file, 'lang data', encoding='utf-8')
+lang['name'] = lang['lname'] + '_'+ lang['fname']
+lang_df = lang[['name','testing date1','testing date2',
+                    'testing date3','testing date4','testing date5',
+                    'testing date6','Testing date 7']]
+lang_dates = lang_df
+lang_dates['#-lang'] = lang_dates.iloc[:,1:].count(1)
 
-data = []
+PASS_file = work_dir + 'PPA_Master_spreadsheet_050117.xlsx'
+PASS = pd.read_excel(PASS_file, 'pass ratings', encoding='utf-8')
+PASS['name'] = PASS['lname'] + '_'+ PASS['fname']
+PASS_df = PASS[['name','PASS date 1','PASS date 2',
+                    'PASS date 3','PASS date 4','PASS date 5',
+                    'PASS date 6','PASS date 7', 'PASS date 8',
+                    'PASS date 9','PASS date 10']]
+PASS_dates = PASS_df
+PASS_dates['#-PASS'] = PASS_dates.iloc[:,1:].count(1)
 
-ID = pd.DataFrame()
-count = 0
-
-date_error = []
-
-ID_error_firstname = []
-ID_error_lastname = []
-ID_error_date = []
-ID_error = []
-
-for file in lang_files:  # Iterate through every found excel file
-    single_ID = pd.DataFrame()
-
-    # Find subject's name from file path
-    single_ID['Subject'] = []
-    m = re.search(work_dir + '/Patients/LastNameA_F/(.+?)/', file)
-    if m:
-        found = m.group(1)
-    m = re.search(work_dir + '/Patients/LastNameG_M/(.+?)/', file)
-    if m:
-        found = m.group(1)
-    m = re.search(work_dir + '/Patients/LastNameN_Z/(.+?)/', file)
-    if m:
-        found = m.group(1)
-    single_ID.ix[0, 'Subject'] = found
-    
-    match = re.search(r'/(\d\d\d\d\d\d)/', file)
-    if match is None:
-        match = re.search(r'(\d\d\d\d\d\d)/', file)
-        if match is None:
-            match = re.search(r'(\d\d\d\d\d\d).xls', file)
-            if match is None:
-                match = re.search(r'(\d\d_\d\d_\d\d)', file)
-                if match is None:
-                    match = re.search(r'(\d\d.\d\d.\d\d)', file)
-                    if match is None:
-                        match = re.search(r'_(\d\d\d\d\d\d)', file)
-                        if match is None:
-                            date_error.append(file)
-                            single_ID.ix[0, 'Date'] = ''
-                        else:
-                            date = datetime.strptime((match.group())[1:], '%m%d%y').date()
-                            single_ID.ix[0, 'Date'] = str(date)
-                    else:
-                        date = datetime.strptime((match.group()), '%m.%d.%y').date()
-                        single_ID.ix[0, 'Date'] = str(date)
-                else:
-                    date = datetime.strptime((match.group()), '%m_%d_%y').date()
-                    single_ID.ix[0, 'Date'] = str(date)
-            else:
-                date = datetime.strptime((match.group())[:-4], '%m%d%y').date()
-                single_ID.ix[0, 'Date'] = str(date)
-        else:
-            date = datetime.strptime((match.group())[:-1], '%m%d%y').date()
-            single_ID.ix[0, 'Date'] = str(date)
+match = pd.merge(lang_dates, PASS_dates, on=['name'], how='outer')
+match = match.applymap(str)
+total_error = []
+compare = []
+for i in match.index:
+    error = []
+    if match['#-lang'][i] == match['#-PASS'][i]:
+        compare.append('Yayyyyyy')
     else:
-        date = datetime.strptime((match.group())[1:-1], '%m%d%y').date()
-        single_ID.ix[0, 'Date'] = str(date)
-    
-    if single_ID['Date'] is None:
-        ID_error_date.append(file)
+        compare.append('Nooooooo')
+    test1 = match.ix[i].str.count(match.loc[i]['testing date1'])
+    test2 = match.ix[i].str.count(match.loc[i]['testing date2'])
+    test3 = match.ix[i].str.count(match.loc[i]['testing date3'])
+    test4 = match.ix[i].str.count(match.loc[i]['testing date4'])
+    test5 = match.ix[i].str.count(match.loc[i]['testing date5'])
+    test6 = match.ix[i].str.count(match.loc[i]['testing date6'])
+    test7 = match.ix[i].str.count(match.loc[i]['Testing date 7'])
+    if sum(test1) < 2:
+        error.append(match.loc[i]['testing date1'])
+    if sum(test2) < 2:
+        error.append(match.loc[i]['testing date2'])
+    if sum(test3) < 2:
+        error.append(match.loc[i]['testing date3'])
+    if sum(test4) < 2:
+        error.append(match.loc[i]['testing date4'])
+    if sum(test5) < 2:
+        error.append(match.loc[i]['testing date5'])
+    if sum(test6) < 2:
+        error.append(match.loc[i]['testing date6'])
+    if sum(test7) < 2:
+        error.append(match.loc[i]['Testing date 7'])
+    else:
+        error.append('none')
+    total_error.append([error])
+        
+match['Lang-PASS'] = compare
+match['error'] = total_error
+
+match['testing date1'] = match['testing date1'].map(lambda x: str(x)[:-8])
+match['testing date2'] = match['testing date2'].map(lambda x: str(x)[:-8])
+match['testing date3'] = match['testing date3'].map(lambda x: str(x)[:-8])
+match['testing date4'] = match['testing date4'].map(lambda x: str(x)[:-8])
+match['testing date5'] = match['testing date5'].map(lambda x: str(x)[:-8])
+match['testing date6'] = match['testing date6'].map(lambda x: str(x)[:-8])
+match['Testing date 7'] = match['Testing date 7'].map(lambda x: str(x)[:-8])
+
+match['PASS date 1'] = match['PASS date 1'].map(lambda x: str(x)[:-8])
+match['PASS date 2'] = match['PASS date 2'].map(lambda x: str(x)[:-8])
+match['PASS date 3'] = match['PASS date 3'].map(lambda x: str(x)[:-8])
+match['PASS date 4'] = match['PASS date 4'].map(lambda x: str(x)[:-8])
+match['PASS date 5'] = match['PASS date 5'].map(lambda x: str(x)[:-8])
+match['PASS date 6'] = match['PASS date 6'].map(lambda x: str(x)[:-8])
+match['PASS date 7'] = match['PASS date 7'].map(lambda x: str(x)[:-8])
+match['PASS date 8'] = match['PASS date 8'].map(lambda x: str(x)[:-8])
+match['PASS date 9'] = match['PASS date 9'].map(lambda x: str(x)[:-8])
+match['PASS date 10'] = match['PASS date 10'].map(lambda x: str(x)[:-8])
+
+match.to_csv('test.csv', encoding='utf-8')
