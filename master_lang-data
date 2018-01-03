@@ -1,0 +1,29 @@
+import pandas as pd
+import csv
+import numpy as np
+import re
+import os
+import fnmatch
+from datetime import datetime
+
+work_dir = '/Users/DickersonLab/Desktop/'
+os.chdir(work_dir)
+
+
+
+def find(pattern, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+    return result
+
+master_file = work_dir + 'PPA_Master_spreadsheet_050117.xlsx'
+master = pd.read_excel(master_file, 'lang data', encoding='utf-8')
+master_df = master[['lname','fname','testing date1','testing date2',
+                    'testing date3','testing date4','testing date5',
+                    'testing date6','Testing date 7']]
+master_df.to_csv('test.csv', encoding='utf-8')
+
+master_dates = master_df.iloc[:,2:]
