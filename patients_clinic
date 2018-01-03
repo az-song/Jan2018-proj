@@ -1,0 +1,40 @@
+import pandas as pd
+import csv
+import numpy as np
+import re
+import os
+import fnmatch
+
+work_dir = '/Users/DickersonLab/Desktop/patients_clinic'
+
+def find(pattern, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+    return result
+
+sprdst_list = []
+mp3_list = []
+word_list = []
+
+spreadsheet = find('*.xls', work_dir)
+for file in spreadsheet:
+    new_name = file[44:]
+    sprdst_list.append(re.findall(r'^\w+', new_name))
+mp3 = find('*.MP3', work_dir)
+for file in mp3:
+    new_name = file[44:]
+    mp3_list.append(re.findall(r'^\w+', new_name))
+word = find('*lang*', work_dir)
+for file in word:
+    if '.docx' in file:
+        new_name = file[44:]
+    word_list.append(re.findall(r'^\w+', new_name))
+dfcolumns = ['Have Xsl', 'Have mp3', 'Have docx']
+excel = pd.DataFrame(columns=dfcolumns)
+excel['Have Xsl'] = sprdst_list
+excel['Have mp3'] = mp3_list
+excel['Have docx'] = word_list
+excel.drop_duplicates(keep="last")
