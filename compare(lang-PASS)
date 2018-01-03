@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 import csv
 import numpy as np
@@ -38,14 +39,34 @@ PASS_dates['#-PASS'] = PASS_dates.iloc[:,1:].count(1)
 
 match = pd.merge(lang_dates, PASS_dates, on=['name'], how='outer')
 match = match.applymap(str)
+
+match['testing date1'] = match['testing date1'].map(lambda x: str(x)[:-8])
+match['testing date2'] = match['testing date2'].map(lambda x: str(x)[:-8])
+match['testing date3'] = match['testing date3'].map(lambda x: str(x)[:-8])
+match['testing date4'] = match['testing date4'].map(lambda x: str(x)[:-8])
+match['testing date5'] = match['testing date5'].map(lambda x: str(x)[:-8])
+match['testing date6'] = match['testing date6'].map(lambda x: str(x)[:-8])
+match['Testing date 7'] = match['Testing date 7'].map(lambda x: str(x)[:-8])
+
+match['PASS date 1'] = match['PASS date 1'].map(lambda x: str(x)[:-8])
+match['PASS date 2'] = match['PASS date 2'].map(lambda x: str(x)[:-8])
+match['PASS date 3'] = match['PASS date 3'].map(lambda x: str(x)[:-8])
+match['PASS date 4'] = match['PASS date 4'].map(lambda x: str(x)[:-8])
+match['PASS date 5'] = match['PASS date 5'].map(lambda x: str(x)[:-8])
+match['PASS date 6'] = match['PASS date 6'].map(lambda x: str(x)[:-8])
+match['PASS date 7'] = match['PASS date 7'].map(lambda x: str(x)[:-8])
+match['PASS date 8'] = match['PASS date 8'].map(lambda x: str(x)[:-8])
+match['PASS date 9'] = match['PASS date 9'].map(lambda x: str(x)[:-8])
+match['PASS date 10'] = match['PASS date 10'].map(lambda x: str(x)[:-8])
+
 total_error = []
 compare = []
 for i in match.index:
     error = []
     if match['#-lang'][i] == match['#-PASS'][i]:
-        compare.append('Yayyyyyy')
+        compare.append('Good')
     else:
-        compare.append('Nooooooo')
+        compare.append('#Lang≠#Pass')
     test1 = match.ix[i].str.count(match.loc[i]['testing date1'])
     test2 = match.ix[i].str.count(match.loc[i]['testing date2'])
     test3 = match.ix[i].str.count(match.loc[i]['testing date3'])
@@ -67,30 +88,11 @@ for i in match.index:
         error.append(match.loc[i]['testing date6'])
     if sum(test7) < 2:
         error.append(match.loc[i]['Testing date 7'])
-    else:
+    if len(error) == 0:
         error.append('none')
-    total_error.append([error])
+    total_error.append(error)
         
 match['Lang-PASS'] = compare
 match['error'] = total_error
-
-match['testing date1'] = match['testing date1'].map(lambda x: str(x)[:-8])
-match['testing date2'] = match['testing date2'].map(lambda x: str(x)[:-8])
-match['testing date3'] = match['testing date3'].map(lambda x: str(x)[:-8])
-match['testing date4'] = match['testing date4'].map(lambda x: str(x)[:-8])
-match['testing date5'] = match['testing date5'].map(lambda x: str(x)[:-8])
-match['testing date6'] = match['testing date6'].map(lambda x: str(x)[:-8])
-match['Testing date 7'] = match['Testing date 7'].map(lambda x: str(x)[:-8])
-
-match['PASS date 1'] = match['PASS date 1'].map(lambda x: str(x)[:-8])
-match['PASS date 2'] = match['PASS date 2'].map(lambda x: str(x)[:-8])
-match['PASS date 3'] = match['PASS date 3'].map(lambda x: str(x)[:-8])
-match['PASS date 4'] = match['PASS date 4'].map(lambda x: str(x)[:-8])
-match['PASS date 5'] = match['PASS date 5'].map(lambda x: str(x)[:-8])
-match['PASS date 6'] = match['PASS date 6'].map(lambda x: str(x)[:-8])
-match['PASS date 7'] = match['PASS date 7'].map(lambda x: str(x)[:-8])
-match['PASS date 8'] = match['PASS date 8'].map(lambda x: str(x)[:-8])
-match['PASS date 9'] = match['PASS date 9'].map(lambda x: str(x)[:-8])
-match['PASS date 10'] = match['PASS date 10'].map(lambda x: str(x)[:-8])
 
 match.to_csv('test.csv', encoding='utf-8')
