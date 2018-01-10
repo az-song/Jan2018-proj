@@ -1,13 +1,12 @@
+
 import pandas as pd
 import csv
 import numpy as np
 import re
 import os
 import fnmatch
-from datetime import datetime
 
-work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/'
-os.chdir(work_dir)
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/patients_clinic'
 
 def find(pattern, path):
     result = []
@@ -17,15 +16,26 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
-master_file = work_dir + 'PPA_Master_spreadsheet_010518.xlsx'
-master = pd.read_excel(master_file, 'lang data', encoding='utf-8')
-master['name'] = master['lname'] + '_'+ master['fname']
-master_df = master[['name','testing date1','testing date2',
-                    'testing date3','testing date4','testing date5',
-                    'testing date6','Testing date 7']]
-master_df.to_csv('test.csv', encoding='utf-8')
+sprdst_list = []
+mp3_list = []
+word_list = []
 
-master_dates = master_df.iloc[:,1:]
-master_dates.count(1)
-
-#for row in master_df.ix[i]:
+spreadsheet = find('*.xls', work_dir)
+for file in spreadsheet:
+    new_name = file[44:]
+    sprdst_list.append(re.findall(r'^\w+', new_name))
+mp3 = find('*.MP3', work_dir)
+for file in mp3:
+    new_name = file[44:]
+    mp3_list.append(re.findall(r'^\w+', new_name))
+word = find('*lang*', work_dir)
+for file in word:
+    if '.docx' in file:
+        new_name = file[44:]
+    word_list.append(re.findall(r'^\w+', new_name))
+dfcolumns = ['Have Xsl', 'Have mp3', 'Have docx']
+excel = pd.DataFrame(columns=dfcolumns)
+excel['Have Xsl'] = sprdst_list
+excel['Have mp3'] = mp3_list
+excel['Have docx'] = word_list
+excel.drop_duplicates(keep="last")
