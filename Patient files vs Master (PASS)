@@ -18,7 +18,7 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
-PASS_file = work_dir + 'PPA_Master_spreadsheet_050117.xlsx'
+PASS_file = work_dir + 'PPA_Master_spreadsheet_010518.xlsx'
 PASS = pd.read_excel(PASS_file, 'pass ratings', encoding='utf-8')
 PASS['name'] = PASS['lname'] + '_'+ PASS['fname']
 pass_df = PASS[['name','PASS date 1','PASS date 2',
@@ -51,6 +51,7 @@ for n in pass_df.index:
             
             unitdf = pd.DataFrame([unit], columns = ['Subject', 'Date'])
             single_dates = single_dates.append(unitdf)
+single_dates = single_dates.apply(lambda x: x.astype(str).str.lower())
 single_dates = single_dates.drop_duplicates(['Subject', 'Date'])
 # single_dates now has a single list of all mastersheet patient visit dates
 
@@ -123,6 +124,7 @@ for file in lang_files:  # Iterate through every found excel file
         if 'PASS' in sprdshts:
 
             full_dates = full_dates.append(single_ID)
+            full_dates = full_dates.apply(lambda x: x.astype(str).str.lower())
             full_dates = full_dates.drop_duplicates(['Subject', 'Date'])
             full_dates = full_dates.reset_index()
             full_dates = full_dates.drop('index', 1)
@@ -133,6 +135,10 @@ for file in lang_files:  # Iterate through every found excel file
 
 total_error = pd.DataFrame()
 merge = pd.merge(full_dates, single_dates, indicator=True, how='outer',on=['Subject', 'Date'])
+merge = merge.drop_duplicates(['Subject', 'Date'])
+merge = merge.sort_index(by=['Subject', 'Date'], ascending=[True, True])
+merge = merge.reset_index()
+merge = merge.drop('index', 1)
 
 final = merge.drop('_merge', axis=1)
 error = []
@@ -143,7 +149,8 @@ for q in final.index:
     if merge.ix[q][2] == 'right_only':
         error.append('PASS in master sheet')
     if merge.ix[q][2] == 'both':
-        final = final.drop([q])
-final['Error'] = error
+        error.append('both good')
+        #final = final.drop([q])
+final['Error PASS'] = error
 
 final.to_csv('PASS-Patient files vs master.csv', encoding='utf-8')
