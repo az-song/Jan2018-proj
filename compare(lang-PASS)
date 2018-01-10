@@ -59,14 +59,17 @@ match['PASS date 8'] = match['PASS date 8'].map(lambda x: str(x)[:-8])
 match['PASS date 9'] = match['PASS date 9'].map(lambda x: str(x)[:-8])
 match['PASS date 10'] = match['PASS date 10'].map(lambda x: str(x)[:-8])
 
-total_error = []
+PASS_error = []
+lang_error = []
 compare = []
 for i in match.index:
-    error = []
+    p_error = []
+    l_error = []
     if match['#-lang'][i] == match['#-PASS'][i]:
         compare.append('Good')
     else:
         compare.append('#Lang≠#Pass')
+    
     test1 = match.ix[i].str.count(match.loc[i]['testing date1'])
     test2 = match.ix[i].str.count(match.loc[i]['testing date2'])
     test3 = match.ix[i].str.count(match.loc[i]['testing date3'])
@@ -75,24 +78,60 @@ for i in match.index:
     test6 = match.ix[i].str.count(match.loc[i]['testing date6'])
     test7 = match.ix[i].str.count(match.loc[i]['Testing date 7'])
     if sum(test1) < 2:
-        error.append(match.loc[i]['testing date1'])
+        p_error.append(match.loc[i]['testing date1'])
     if sum(test2) < 2:
-        error.append(match.loc[i]['testing date2'])
+        p_error.append(match.loc[i]['testing date2'])
     if sum(test3) < 2:
-        error.append(match.loc[i]['testing date3'])
+        p_error.append(match.loc[i]['testing date3'])
     if sum(test4) < 2:
-        error.append(match.loc[i]['testing date4'])
+        p_error.append(match.loc[i]['testing date4'])
     if sum(test5) < 2:
-        error.append(match.loc[i]['testing date5'])
+        p_error.append(match.loc[i]['testing date5'])
     if sum(test6) < 2:
-        error.append(match.loc[i]['testing date6'])
+        p_error.append(match.loc[i]['testing date6'])
     if sum(test7) < 2:
-        error.append(match.loc[i]['Testing date 7'])
-    if len(error) == 0:
-        error.append('none')
-    total_error.append(error)
+        p_error.append(match.loc[i]['Testing date 7'])
+    if len(p_error) == 0:
+        p_error.append('none')
+    PASS_error.append(p_error)
+    
+    test1 = match.ix[i].str.count(match.loc[i]['PASS date 1'])
+    test2 = match.ix[i].str.count(match.loc[i]['PASS date 2'])
+    test3 = match.ix[i].str.count(match.loc[i]['PASS date 3'])
+    test4 = match.ix[i].str.count(match.loc[i]['PASS date 4'])
+    test5 = match.ix[i].str.count(match.loc[i]['PASS date 5'])
+    test6 = match.ix[i].str.count(match.loc[i]['PASS date 6'])
+    test7 = match.ix[i].str.count(match.loc[i]['PASS date 7'])
+    test8 = match.ix[i].str.count(match.loc[i]['PASS date 8'])
+    test9 = match.ix[i].str.count(match.loc[i]['PASS date 9'])
+    test10 = match.ix[i].str.count(match.loc[i]['PASS date 10'])
+
+    if sum(test1) < 2:
+        l_error.append(match.loc[i]['PASS date 1'])
+    if sum(test2) < 2:
+        l_error.append(match.loc[i]['PASS date 2'])
+    if sum(test3) < 2:
+        l_error.append(match.loc[i]['PASS date 3'])
+    if sum(test4) < 2:
+        l_error.append(match.loc[i]['PASS date 4'])
+    if sum(test5) < 2:
+        l_error.append(match.loc[i]['PASS date 5'])
+    if sum(test6) < 2:
+        l_error.append(match.loc[i]['PASS date 6'])
+    if sum(test7) < 2:
+        l_error.append(match.loc[i]['PASS date 7'])
+    if sum(test7) < 2:
+        l_error.append(match.loc[i]['PASS date 8'])
+    if sum(test7) < 2:
+        l_error.append(match.loc[i]['PASS date 9'])
+    if sum(test7) < 2:
+        l_error.append(match.loc[i]['PASS date 10'])
+    if len(l_error) == 0:
+        l_error.append('none')
+    lang_error.append(l_error)
         
 match['Lang-PASS'] = compare
-match['error'] = total_error
+match['Yes Lang, No Pass'] = PASS_error
+match['No Lang, Yes Pass'] = lang_error
 
 match.to_csv('test.csv', encoding='utf-8')
