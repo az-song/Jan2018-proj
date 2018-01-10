@@ -15,15 +15,15 @@ lang_df = pd.read_csv(work_dir + '/lang-Patient files vs master.csv', encoding='
 merge = pd.merge(lang_df, pass_df, indicator=True, how='outer',on=['Subject', 'Date'])
 merge = merge.drop('Unnamed: 0_y', axis=1)
 merge = merge.drop('Unnamed: 0_x', axis=1)
+merge = merge.drop_duplicates(['Subject', 'Date'])
+merge = merge.sort_index(by=['Subject', 'Date'], ascending=[True, True])
+merge = merge.reset_index()
+merge = merge.drop('index', 1)
 final = merge.drop('_merge', axis=1)
 
-final.to_csv('test.csv', encoding='utf-8')
-'''
 for q in final.index:
-    if merge.ix[q][2] == 'left_only':
-        error.append('PASS in patient files')
-    if merge.ix[q][2] == 'right_only':
-        error.append('PASS in master sheet')
-    if merge.ix[q][2] == 'both':
-        final = final.drop([q])
-'''
+    if final.ix[q][2] == 'both good':
+        if final.ix[q][3] == 'both good':
+            final = final.drop([q])
+
+final.to_csv('test.csv', encoding='utf-8')
