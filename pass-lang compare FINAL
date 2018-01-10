@@ -26,4 +26,4 @@ for q in final.index:
         if final.ix[q][3] == 'both good':
             final = final.drop([q])
 
-final.to_csv('test.csv', encoding='utf-8')
+final.to_csv('FINAL.csv', encoding='utf-8')
