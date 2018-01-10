@@ -68,7 +68,9 @@ ID_error = []
 for file in lang_files:  # Iterate through every found excel file
     single_ID = pd.DataFrame()
 
-    if 'lang' in file:
+    xl = pd.ExcelFile(file)
+    sprdshts = xl.sheet_names  # see all sheet names
+    if 'PASS' in sprdshts:
 
         #Find subject's name from file path
         single_ID['Subject'] = []
