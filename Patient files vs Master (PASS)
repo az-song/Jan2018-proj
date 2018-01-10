@@ -118,19 +118,18 @@ for file in lang_files:  # Iterate through every found excel file
     if single_ID['Date'] is None:
         date_error.append(file)
 
-    if 'lang' in file:
-        xl = pd.ExcelFile(file)
-        sprdshts = xl.sheet_names  # see all sheet names
-        if 'PASS' in sprdshts:
+    xl = pd.ExcelFile(file)
+    sprdshts = xl.sheet_names  # see all sheet names
+    if 'PASS' in sprdshts:
 
-            full_dates = full_dates.append(single_ID)
-            full_dates = full_dates.apply(lambda x: x.astype(str).str.lower())
-            full_dates = full_dates.drop_duplicates(['Subject', 'Date'])
-            full_dates = full_dates.reset_index()
-            full_dates = full_dates.drop('index', 1)
+        full_dates = full_dates.append(single_ID)
+        full_dates = full_dates.apply(lambda x: x.astype(str).str.lower())
+        full_dates = full_dates.drop_duplicates(['Subject', 'Date'])
+        full_dates = full_dates.reset_index()
+        full_dates = full_dates.drop('index', 1)
         
-        else:
-            noPass = noPass.append(single_ID)
+    else:
+        noPass = noPass.append(single_ID)
 #full_dates now has all visits from patient files
 
 total_error = pd.DataFrame()
