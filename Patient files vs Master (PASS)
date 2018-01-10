@@ -26,16 +26,16 @@ pass_df = PASS[['name','PASS date 1','PASS date 2',
                     'PASS date 6','PASS date 7', 'PASS date 8',
                     'PASS date 9','PASS date 10']]
 pass_df = pass_df.applymap(str)
-pass_df['PASS date 1'] = pass_df['PASS date 1'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 2'] = pass_df['PASS date 2'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 3'] = pass_df['PASS date 3'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 4'] = pass_df['PASS date 4'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 5'] = pass_df['PASS date 5'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 6'] = pass_df['PASS date 6'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 7'] = pass_df['PASS date 7'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 8'] = pass_df['PASS date 8'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 9'] = pass_df['PASS date 9'].map(lambda x: str(x)[:-8])
-pass_df['PASS date 10'] = pass_df['PASS date 10'].map(lambda x: str(x)[:-8])
+pass_df['PASS date 1'] = pass_df['PASS date 1'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 2'] = pass_df['PASS date 2'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 3'] = pass_df['PASS date 3'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 4'] = pass_df['PASS date 4'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 5'] = pass_df['PASS date 5'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 6'] = pass_df['PASS date 6'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 7'] = pass_df['PASS date 7'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 8'] = pass_df['PASS date 8'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 9'] = pass_df['PASS date 9'].map(lambda x: str(x)[:-9])
+pass_df['PASS date 10'] = pass_df['PASS date 10'].map(lambda x: str(x)[:-9])
 
 pass_df.replace(r'', np.nan)
 
