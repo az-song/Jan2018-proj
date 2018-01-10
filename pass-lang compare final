@@ -1,0 +1,29 @@
+import pandas as pd
+import csv
+import numpy as np
+import re
+import os
+import fnmatch
+from datetime import datetime
+
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/'
+os.chdir(work_dir)
+
+pass_df = pd.read_csv(work_dir + '/PASS-Patient files vs master.csv', encoding='utf-8')
+lang_df = pd.read_csv(work_dir + '/lang-Patient files vs master.csv', encoding='utf-8')
+
+merge = pd.merge(lang_df, pass_df, indicator=True, how='outer',on=['Subject', 'Date'])
+merge = merge.drop('Unnamed: 0_y', axis=1)
+merge = merge.drop('Unnamed: 0_x', axis=1)
+final = merge.drop('_merge', axis=1)
+
+final.to_csv('test.csv', encoding='utf-8')
+'''
+for q in final.index:
+    if merge.ix[q][2] == 'left_only':
+        error.append('PASS in patient files')
+    if merge.ix[q][2] == 'right_only':
+        error.append('PASS in master sheet')
+    if merge.ix[q][2] == 'both':
+        final = final.drop([q])
+'''
