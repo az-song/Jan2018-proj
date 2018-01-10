@@ -7,7 +7,7 @@ import os
 import fnmatch
 from datetime import datetime
 
-work_dir = '/Users/DickersonLab/Desktop/'
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/'
 os.chdir(work_dir)
 
 def find(pattern, path):
@@ -68,7 +68,7 @@ for i in match.index:
     if match['#-lang'][i] == match['#-PASS'][i]:
         compare.append('Good')
     else:
-        compare.append('#Lang≠#Pass')
+        compare.append('Lang<Pass')
     
     test1 = match.ix[i].str.count(match.loc[i]['testing date1'])
     test2 = match.ix[i].str.count(match.loc[i]['testing date2'])
@@ -134,4 +134,4 @@ match['Lang-PASS'] = compare
 match['Yes Lang, No Pass'] = PASS_error
 match['No Lang, Yes Pass'] = lang_error
 
-match.to_csv('test.csv', encoding='utf-8')
+match.to_csv('compare_PASS-Lang.csv', encoding='utf-8')
