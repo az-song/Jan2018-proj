@@ -132,9 +132,9 @@ error = []
 
 for q in final.index:
     if merge.ix[q][2] == 'left_only':
-        error.append('only in patient files')
+        error.append('Lang in patient files')
     if merge.ix[q][2] == 'right_only':
-        error.append('only in master sheet')
+        error.append('Lang in master sheet')
     if merge.ix[q][2] == 'both':
         final = final.drop([q])
 final['Error'] = error
