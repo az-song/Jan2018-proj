@@ -5,7 +5,7 @@ import re
 import os
 import fnmatch
 
-work_dir = '/Users/DickersonLab/Desktop/patients_clinic'
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/patients_clinic'
 
 def find(pattern, path):
     result = []
