@@ -126,13 +126,15 @@ total_error = pd.DataFrame()
 merge = pd.merge(full_dates, single_dates, indicator=True, how='outer',on=['Subject', 'Date'])
 
 final = merge.drop('_merge', axis=1)
+error = []
 
 for q in final.index:
-    if merge.loc[q]['_merge'] == 'both':
+    if merge.ix[q][2] == 'left_only':
+        error.append('only in patient files')
+    if merge.ix[q][2] == 'right_only':
+        error.append('only in master sheet')
+    if merge.ix[q][2] == 'both':
         final = final.drop([q])
-    if merge.loc[q]['_merge'] == 'left_only':
-        final.loc[q]['Missing'] = 'only in patient files'
-    if merge.loc[q]['_merge'] == 'right_only':
-        final.loc[q]['Missing'] = 'only in master sheet'
+final['Error'] = error
 
 final.to_csv('lang-Patient files vs master.csv', encoding='utf-8')
