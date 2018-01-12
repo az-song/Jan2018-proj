@@ -23,7 +23,7 @@ lang = pd.read_excel(lang_file, 'lang data', encoding='utf-8')
 lang['name'] = lang['lname'] + '_'+ lang['fname']
 lang_df = lang[['name','testing date1','testing date2',
                     'testing date3','testing date4','testing date5',
-                    'testing date6','Testing date 7']]
+                    'testing date6','Testing date 7','Testing date 8','Testing date 9']]
 lang_df = lang_df.applymap(str)
 lang_df['testing date1'] = lang_df['testing date1'].map(lambda x: str(x)[:-9])
 lang_df['testing date2'] = lang_df['testing date2'].map(lambda x: str(x)[:-9])
@@ -32,10 +32,12 @@ lang_df['testing date4'] = lang_df['testing date4'].map(lambda x: str(x)[:-9])
 lang_df['testing date5'] = lang_df['testing date5'].map(lambda x: str(x)[:-9])
 lang_df['testing date6'] = lang_df['testing date6'].map(lambda x: str(x)[:-9])
 lang_df['Testing date 7'] = lang_df['Testing date 7'].map(lambda x: str(x)[:-9])
+lang_df['Testing date 8'] = lang_df['Testing date 8'].map(lambda x: str(x)[:-9])
+lang_df['Testing date 9'] = lang_df['Testing date 9'].map(lambda x: str(x)[:-9])
 
 lang_df.replace(r'', np.nan)
 
-row = [1,2,3,4,5,6,7]
+row = [1,2,3,4,5,6,7, 8, 9]
 single_dates = pd.DataFrame(columns = ['Subject', 'Date'])
 
 for n in lang_df.index:
