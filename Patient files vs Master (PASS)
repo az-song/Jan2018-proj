@@ -24,7 +24,10 @@ PASS['name'] = PASS['lname'] + '_'+ PASS['fname']
 pass_df = PASS[['name','PASS date 1','PASS date 2',
                     'PASS date 3','PASS date 4','PASS date 5',
                     'PASS date 6','PASS date 7', 'PASS date 8',
-                    'PASS date 9','PASS date 10']]
+                    'PASS date 9','PASS date 10','Artic 1','Artic 2',
+                    'Artic 3','Artic 4','Artic 5','Artic 6','Artic 7',
+                    'Artic 8','Artic 9','artic 10']]
+
 pass_df = pass_df.applymap(str)
 pass_df['PASS date 1'] = pass_df['PASS date 1'].map(lambda x: str(x)[:-9])
 pass_df['PASS date 2'] = pass_df['PASS date 2'].map(lambda x: str(x)[:-9])
@@ -39,12 +42,12 @@ pass_df['PASS date 10'] = pass_df['PASS date 10'].map(lambda x: str(x)[:-9])
 
 pass_df.replace(r'', np.nan)
 
-row = [1,2,3,4,5,6,7]
+row = [1,2,3,4,5,6,7,8,9,10]
 single_dates = pd.DataFrame(columns = ['Subject', 'Date'])
 
 for n in pass_df.index:
     for m in row:
-        if (pass_df.ix[n][m] is not '') == True:
+        if (pass_df.ix[n][m] is not '') and (pass_df.ix[n][m+10] != 'nan'):
             unit = []
             unit.append(pass_df.ix[n][0])
             unit.append(pass_df.ix[n][m])
