@@ -18,13 +18,13 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
-PASS_file = work_dir + 'PPA_Master_spreadsheet_010518.xlsx'
+PASS_file = work_dir + 'PPA_Master_spreadsheet_011318.xlsx'
 PASS = pd.read_excel(PASS_file, 'pass ratings', encoding='utf-8')
 PASS['name'] = PASS['lname'] + '_'+ PASS['fname']
 name = PASS['name']
 PASS = PASS.drop(labels=['name'], axis=1,inplace = True)
 PASS = PASS.drop([0,1,2,3,4,5,6,7,8,9], axis=1,inplace = True)
-PASS = PASS.insert(0, 'Subject', name)
+PASS = PASS.insert(0, 'subject_id', name)
 
 dates = ['PASS date 1','PASS date 2','PASS date 3','PASS date 4','PASS date 5',
          'PASS date 6','PASS date 7','PASS date 8','PASS date 9','PASS date 10']
@@ -37,7 +37,13 @@ PASS.replace(r'', np.nan)
 
 row = [3,21,39,57,75,93,111,129,147,165]
 
-pass_df = pd.DataFrame(columns = ['Subject', 'Date', ''])
+pass_col = ['subject_id', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
+            'pass_cons_flu','pass_cons_gra','pass_cons_wrt','pass_cons_rep',
+            'pass_cons_ac','pass_cons_swc','pass_cons_read','pass_cons_writ',
+            'pass_cons_fct','pass_cons_sob','pass_cons_init','pass_cons_turn',
+            'pass_cons_gen','pass_cons_cdrlang','pass_cons_cdrbeh',]
+
+pass_df = pd.DataFrame(columns = pass_col)
 
 for n in PASS.index:
     for m in row:
@@ -46,9 +52,32 @@ for n in PASS.index:
             unit.append(PASS.ix[n][0])
             unit.append(PASS.ix[n][m:m+17])
             
-            unitdf = pd.DataFrame([unit], columns = ['Subject', 'Date', ''])
+            unitdf = pd.DataFrame([unit], columns = pass_col)
             pass_df = pass_df.append(unitdf)
 pass_df = pass_df.apply(lambda x: x.astype(str).str.lower())
-pass_df = pass_df.drop_duplicates(['Subject', 'Date'])
+pass_df = pass_df.drop_duplicates(['subject_id', 'pass_summary_date'])
+pass_df = pass_df.sort_index(by=['Subject', 'Date'], ascending=[True, True])
+
+pass_df = pass_df[['subject_id', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
+                   'pass_cons_flu','pass_cons_gra','pass_cons_wrt','pass_cons_rep',
+                   'pass_cons_ac','pass_cons_swc','pass_cons_read','pass_cons_writ',
+                   'pass_cons_fct','pass_cons_cdrlang','pass_cons_cdrbeh','pass_cons_init'
+                   'pass_cons_turn','pass_cons_gen', 'pass_cons_sob']]
+
+subjects = pass_df[Subject','Date']
+
+visit = pd.DataFrame(columns = ['Redcap event'])
+for n in pass_df.index.tolist():
+    row = subjects.loc[[n]]
+    visit = (row).append(visit)
+    name = subjects.loc[n]['Subject']
+    visit_num = visit.Subject.str.contains(name).sum()
+    if visit_num == 1:
+        visitID.loc[n]['Redcap event'] = 'static_arm_1'
+    else:
+        visitID.loc[n]['Redcap event'] = 'visit_' + str(visit_num) + '_arm_1'
+
+visit_id = visit['Redcap event']
+pass_df = pass_df.insert('Redcap event', visit_id)
 
 
