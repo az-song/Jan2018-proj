@@ -84,6 +84,6 @@ pass_df['Redcap event'] = visit_id
 pass_df = pass_df.replace('nan','00')
 pass_df = pass_df.replace('na','00')
 pass_df = pass_df.replace('n/a','00')
-pass_df = pass_df.replace('not accessed','00')
+pass_df = pass_df.replace('not assessed','00')
 
 pass_df.to_csv('pass to redcap.csv', encoding='utf-8')
