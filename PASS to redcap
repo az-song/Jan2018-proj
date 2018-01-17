@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+import pandas as pd
+import csv
+import numpy as np
+import re
+import os
+import fnmatch
+from datetime import datetime
+
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/'
+os.chdir(work_dir)
+
+def find(pattern, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+    return result
+
+PASS_file = work_dir + 'PPA_Master_spreadsheet_010518.xlsx'
+PASS = pd.read_excel(PASS_file, 'pass ratings', encoding='utf-8')
+PASS['name'] = PASS['lname'] + '_'+ PASS['fname']
+name = PASS['name']
+PASS = PASS.drop(labels=['name'], axis=1,inplace = True)
+PASS = PASS.drop([0,1,2,3,4,5,6,7,8,9], axis=1,inplace = True)
+PASS = PASS.insert(0, 'Subject', name)
+
+dates = ['PASS date 1','PASS date 2','PASS date 3','PASS date 4','PASS date 5',
+         'PASS date 6','PASS date 7','PASS date 8','PASS date 9','PASS date 10']
+
+for date in dates:
+    PASS[date] = PASS[date].astype(str)
+    PASS[date] = PASS[date].map(lambda x: str(x)[:-9])
+
+PASS.replace(r'', np.nan)
+
+row = [3,21,39,57,75,93,111,129,147,165]
+
+pass_df = pd.DataFrame(columns = ['Subject', 'Date', ''])
+
+for n in PASS.index:
+    for m in row:
+        if PASS.ix[n][m] is not '':
+            unit = []
+            unit.append(PASS.ix[n][0])
+            unit.append(PASS.ix[n][m:m+17])
+            
+            unitdf = pd.DataFrame([unit], columns = ['Subject', 'Date', ''])
+            pass_df = pass_df.append(unitdf)
+pass_df = pass_df.apply(lambda x: x.astype(str).str.lower())
+pass_df = pass_df.drop_duplicates(['Subject', 'Date'])
+
+
