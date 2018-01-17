@@ -56,7 +56,7 @@ for n in PASS.index:
             pass_df = pass_df.append(unitdf)
 pass_df = pass_df.apply(lambda x: x.astype(str).str.lower())
 pass_df = pass_df.drop_duplicates(['subject_id', 'pass_summary_date'])
-pass_df = pass_df.sort_index(by=['Subject', 'Date'], ascending=[True, True])
+pass_df = pass_df.sort_index(by=['subject_id', 'pass_summary'], ascending=[True, True])
 
 pass_df = pass_df[['subject_id', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
                    'pass_cons_flu','pass_cons_gra','pass_cons_wrt','pass_cons_rep',
@@ -73,11 +73,10 @@ for n in pass_df.index.tolist():
     name = subjects.loc[n]['Subject']
     visit_num = visit.Subject.str.contains(name).sum()
     if visit_num == 1:
-        visitID.loc[n]['Redcap event'] = 'static_arm_1'
+        visit.loc[n]['Redcap event'] = 'static_arm_1'
     else:
-        visitID.loc[n]['Redcap event'] = 'visit_' + str(visit_num) + '_arm_1'
+        visit.loc[n]['Redcap event'] = 'visit_' + str(visit_num) + '_arm_1'
 
 visit_id = visit['Redcap event']
-pass_df = pass_df.insert('Redcap event', visit_id)
-
+pass_df['Redcap event'] = visit_id
 
