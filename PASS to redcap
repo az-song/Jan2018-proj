@@ -94,7 +94,7 @@ pass_df['id'] = pass_df['init'] + (pass_df['last'].astype(str).str[:3])
 
 pass_df = pass_df.drop(['first','init','last', 'pass_cons_sob'], axis=1)
 
-pass_df.to_csv('pass test.csv', encoding='utf-8')
+pass_df.to_csv('pass to redcap.csv', encoding='utf-8')
 
 subject = work_dir + 'subject_id.csv'
 full = pd.read_csv(subject)
@@ -110,4 +110,4 @@ match = match.drop(['id','subject_id'], axis=1)
 match.insert(0, 'subject_id', subject_id)
 match = match.drop_duplicates(['subject', 'pass_summary_date'])
 
-match.to_csv('pass to redcap.csv', encoding='utf-8')
+match.to_csv('match test.csv', encoding='utf-8')
