@@ -1,0 +1,188 @@
+# -*- coding: utf-8 -*-
+import pandas as pd
+import csv
+import numpy as np
+import re
+import os
+import fnmatch
+from datetime import datetime
+
+work_dir = '/Users/DickersonLab/Desktop/Alex-winter-proj/'
+os.chdir(work_dir)
+
+lang_file = work_dir + 'PPA_Master_spreadsheet_011318.xlsx'
+langdf = pd.read_excel(lang_file, 'lang data', encoding='utf-8')
+name = langdf['lname'] + '_'+ langdf['fname']
+langdf.drop(langdf.columns[:8], axis=1,inplace = True)
+langdf.drop(langdf.columns[1], axis=1, inplace = True)
+langdf.insert(0, 'subject', name)
+
+langdf = langdf.drop(['scan date2','scan date3', 'scan date4'], axis=1)
+
+dates = ['testing date1','testing date2','testing date3','testing date4','testing date5',
+         'testing date6','Testing date 7','Testing date 8','Testing date 9']
+
+errors = ['.1','.2','.3','.4','.5','.6','.7','.8','.9']
+
+for names in langdf.columns:
+    for error in errors:
+        if error in names:
+            langdf.rename(columns={names:names[:-2]}, inplace=True)
+langdf.rename(columns={'vegetables':'Veg'}, inplace=True)
+langdf.rename(columns={'animals':'Animals'}, inplace=True)
+
+lang = langdf
+
+lang.rename(columns={'BDAE Aphasia Severity Scale':'bdae_aphasia_scale'}, inplace=True)
+lang.rename(columns={'BNT':'bnt_summary'}, inplace=True)
+lang.rename(columns={'WAB Commands':'wab_commands_summary'}, inplace=True)
+lang.rename(columns={'PAL Aud Sent Comp':'pal_aud_comp_summary'}, inplace=True)
+lang.rename(columns={'CSB WPM':'csb_wpm_summary'}, inplace=True)
+lang.rename(columns={'PPT':'ppt_summary'}, inplace=True)
+lang.rename(columns={'WAB Rep':'wab_rep_summary'}, inplace=True)
+lang.rename(columns={'FAS':'fas_summary'}, inplace=True)
+lang.rename(columns={'Animals':'animals_summary'}, inplace=True)
+lang.rename(columns={'Fruits':'fruits_summary'}, inplace=True)
+lang.rename(columns={'Veg':'vegetables_summary'}, inplace=True)
+lang.rename(columns={'NAT':'nat_summary'}, inplace=True)
+lang.rename(columns={'WAB Reading Comp of Sentences':'wab_read_cos_summary'}, inplace=True)
+lang.rename(columns={'WAB Reading Commands':'wab_read_comm_summary'}, inplace=True)
+lang.rename(columns={'CSB Naming':'csb_naming_summary'}, inplace=True)
+lang.rename(columns={'Spelling':'spelling_summary'}, inplace=True)
+lang.rename(columns={'Hillis Verb Naming':'hillis_verb_nam_summary'}, inplace=True)
+lang.rename(columns={'PALPA WPM':'palpa_wpm_summary'}, inplace=True)
+lang.rename(columns={'Cactus Camel':'cactus_camel_summary'}, inplace=True)
+lang.rename(columns={'WAB FGP':'wab_fgp_summary'}, inplace=True)
+lang.rename(columns={'BDAE Gramm Form':'bdae_gramm_summary'}, inplace=True)
+lang.rename(columns={'BDAE Commands':'bdae_comm_summary'}, inplace=True)
+lang.rename(columns={'BDAE Rep - words':'wab_rep_words_summary'}, inplace=True)
+lang.rename(columns={'BDAE Rep - sentences':'wab_rep_sent_summary'}, inplace=True)
+lang.rename(columns={'Definitions':'definitions_summary'}, inplace=True)
+
+for date in dates:
+    lang[date] = lang[date].astype(str)
+    #lang[date] = lang[date].map(lambda x: str(x)[:-9])
+
+lang.replace(r'', np.nan)
+
+alldates = []
+for date in dates:
+    single = lang.columns.get_loc(date)
+    alldates.append(single)
+
+lang_col = ['subject','testing_summary_date','bdae_aphasia_scale',
+            'bnt_summary','wab_commands_summary','pal_aud_comp_summary',
+            'csb_wpm_summary','ppt_summary','wab_rep_summary',
+            'fas_summary','animals_summary','fruits_summary','vegetables_summary',
+            'nat_summary','wab_read_cos_summary','wab_read_comm_summary',
+            'csb_naming_summary','spelling_summary','hillis_verb_nam_summary'
+            'palpa_wpm_summary','cactus_camel_summary','wab_fgp_summary',
+            'verb_naming_summary','bdae_gramm_summary','bdae_comm_summary',
+            'wab_rep_words_summary','wab_rep_sent_summary','definitions_summary']
+
+lang_df = pd.DataFrame(columns = lang_col)
+test = pd.DataFrame()
+
+for date in dates:
+    lang.rename(columns={date:'testing_summary_date'}, inplace=True)
+
+for n in lang.index:
+    for m in alldates:
+        if (lang.ix[n][m] is not '') and (lang.ix[n][m] != 'NaT') and (lang.ix[n][m] != 'nat') and (lang.ix[n][m] != 'NaN'):
+            name = lang.ix[n][0]
+            if m == 1:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:26])
+            if m == 26:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:47])
+            if m == 47:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:68])
+            if m == 68:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:88])
+            if m == 88:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:111])
+            if m == 111:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:134])
+            if m == 134:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:156])
+            if m == 156:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:178])
+            if m == 178:
+                unit = pd.DataFrame()
+                unit = unit.append(lang.ix[n][m:200])
+            unit.insert(0,'subject', name)
+            
+            test = test.append(unit)
+            #unitdf = pd.DataFrame([unit], columns = lang_col)
+            #lang_df = lang_df.append(unitdf)
+
+test = test.apply(lambda x: x.astype(str).str.lower())
+test = test.drop_duplicates(['subject', 'testing_summary_date'])
+test = test.sort_index(by=['subject', 'testing_summary_date'], ascending=[True, True])
+test = test.reset_index(drop=True)
+
+test = test[['subject','testing_summary_date','bdae_aphasia_scale',
+             'bnt_summary','wab_commands_summary','pal_aud_comp_summary',
+             'csb_wpm_summary','ppt_summary','wab_rep_summary',
+             'fas_summary','animals_summary','fruits_summary','vegetables_summary',
+             'nat_summary','wab_read_cos_summary','wab_read_comm_summary',
+             'csb_naming_summary','spelling_summary','hillis_verb_nam_summary',
+             'palpa_wpm_summary','cactus_camel_summary','wab_fgp_summary',
+             'bdae_gramm_summary','bdae_comm_summary',
+             'wab_rep_words_summary','wab_rep_sent_summary','definitions_summary']]
+
+subjects = test[['subject','testing_summary_date']]
+
+
+visit = pd.DataFrame(columns = ['Redcap event'])
+for n in test.index:
+    row = subjects.loc[[n]]
+    visit = (row).append(visit)
+    name = subjects.ix[n][0]
+    visit_num = visit['subject'].str.contains(name).sum()
+    if visit_num == 1:
+        visit.loc[n]['Redcap event'] = 'static_arm_1'
+    else:
+        visit.loc[n]['Redcap event'] = 'visit_' + str(visit_num) + '_arm_1'
+
+visit_id = visit['Redcap event']
+test['Redcap event'] = visit_id
+
+test = test.replace('nan','n/a')
+test = test.replace('na','n/a')
+test = test.replace('n/a','n/a')
+test = test.replace('not assessed','n/a')
+
+test['first'] = test['subject'].str.extract('.+?_(.*)', expand=True)
+test['init'] = test['first'].astype(str).str[0]
+test['last'] = test['subject'].str.extract('(.*)_.+?', expand=True)
+
+test['id'] = test['init'] + (test['last'].astype(str).str[:3])
+
+test = test.drop(['first','init','last'], axis=1)
+
+test.to_csv('lang test.csv', encoding='utf-8')
+
+subject = work_dir + 'subject_id.csv'
+full = pd.read_csv(subject)
+full = full.applymap(str)
+subject_id = full[full.columns[:1]]
+subject_id['id'] = subject_id['subject_id'].str[:4]
+subject_id['id'] = subject_id['id'].str.lower()
+
+match = pd.merge(test, subject_id, on=['id'], how='outer')
+
+subject_id = match['subject_id']
+match = match.drop(['id','subject_id'], axis=1)
+match.insert(0, 'subject_id', subject_id)
+match = match.drop_duplicates(['subject', 'testing_summary_date'])
+
+match.to_csv('lang to redcap.csv', encoding='utf-8')
+
