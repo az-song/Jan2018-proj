@@ -17,7 +17,7 @@ passdf = pd.read_excel(PASS_file, 'pass ratings', encoding='utf-8')
 #passdf = passdf.drop(passdf['name'], axis=1,inplace = True)
 name = passdf['lname'] + '_'+ passdf['fname']
 passdf.drop(passdf.columns[:11], axis=1,inplace = True)
-passdf.insert(0, 'subject_id', name)
+passdf.insert(0, 'subject', name)
 
 dates = ['PASS date 1','PASS date 2','PASS date 3','PASS date 4','PASS date 5',
          'PASS date 6','PASS date 7','PASS date 8','PASS date 9','PASS date 10']
@@ -32,7 +32,7 @@ PASS.replace(r'', np.nan)
 
 row = [1,19,37,55,73,91,109,127,145,163]
 
-pass_col = ['subject_id', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
+pass_col = ['subject', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
             'pass_cons_flu','pass_cons_gra','pass_cons_wrt','pass_cons_rep',
             'pass_cons_ac','pass_cons_swc','pass_cons_read','pass_cons_writ',
             'pass_cons_fct','pass_cons_sob','pass_cons_init','pass_cons_turn',
@@ -55,24 +55,24 @@ for n in PASS.index:
             unitdf = pd.DataFrame([unit], columns = pass_col)
             pass_df = pass_df.append(unitdf)
 pass_df = pass_df.apply(lambda x: x.astype(str).str.lower())
-pass_df = pass_df.drop_duplicates(['subject_id', 'pass_summary_date'])
-pass_df = pass_df.sort_index(by=['subject_id', 'pass_summary_date'], ascending=[True, True])
+pass_df = pass_df.drop_duplicates(['subject', 'pass_summary_date'])
+pass_df = pass_df.sort_index(by=['subject', 'pass_summary_date'], ascending=[True, True])
 pass_df = pass_df.reset_index(drop=True)
 
-pass_df = pass_df[['subject_id', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
+pass_df = pass_df[['subject', 'pass_summary_date','pass_cons_raters','pass_cons_artic',
                    'pass_cons_flu','pass_cons_gra','pass_cons_wrt','pass_cons_rep',
                    'pass_cons_ac','pass_cons_swc','pass_cons_read','pass_cons_writ',
                    'pass_cons_fct','pass_cons_cdrlang','pass_cons_cdrbeh','pass_cons_init',
                    'pass_cons_turn','pass_cons_gen', 'pass_cons_sob']]
 
-subjects = pass_df[['subject_id','pass_summary_date']]
+subjects = pass_df[['subject','pass_summary_date']]
 
 visit = pd.DataFrame(columns = ['Redcap event'])
 for n in pass_df.index:
     row = subjects.loc[[n]]
     visit = (row).append(visit)
     name = subjects.ix[n][0]
-    visit_num = visit['subject_id'].str.contains(name).sum()
+    visit_num = visit['subject'].str.contains(name).sum()
     if visit_num == 1:
         visit.loc[n]['Redcap event'] = 'static_arm_1'
     else:
@@ -81,9 +81,33 @@ for n in pass_df.index:
 visit_id = visit['Redcap event']
 pass_df['Redcap event'] = visit_id
 
-pass_df = pass_df.replace('nan','00')
-pass_df = pass_df.replace('na','00')
-pass_df = pass_df.replace('n/a','00')
-pass_df = pass_df.replace('not assessed','00')
+pass_df = pass_df.replace('nan','n/a')
+pass_df = pass_df.replace('na','n/a')
+pass_df = pass_df.replace('n/a','n/a')
+pass_df = pass_df.replace('not assessed','n/a')
 
-pass_df.to_csv('pass to redcap.csv', encoding='utf-8')
+pass_df['first'] = pass_df['subject'].str.extract('.+?_(.*)', expand=True)
+pass_df['init'] = pass_df['first'].astype(str).str[0]
+pass_df['last'] = pass_df['subject'].str.extract('(.*)_.+?', expand=True)
+
+pass_df['id'] = pass_df['init'] + (pass_df['last'].astype(str).str[:3])
+
+pass_df = pass_df.drop(['first','init','last', 'pass_cons_sob'], axis=1)
+
+pass_df.to_csv('pass test.csv', encoding='utf-8')
+
+subject = work_dir + 'subject_id.csv'
+full = pd.read_csv(subject)
+full = full.applymap(str)
+subject_id = full[full.columns[:1]]
+subject_id['id'] = subject_id['subject_id'].str[:4]
+subject_id['id'] = subject_id['id'].str.lower()
+
+match = pd.merge(pass_df, subject_id, on=['id'], how='outer')
+
+subject_id = match['subject_id']
+match = match.drop(['id','subject_id'], axis=1)
+match.insert(0, 'subject_id', subject_id)
+match = match.drop_duplicates(['subject', 'pass_summary_date'])
+
+match.to_csv('pass to redcap.csv', encoding='utf-8')
